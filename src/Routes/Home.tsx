@@ -4,7 +4,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { getMovies, IGetMoviesResult } from "../api";
 import { makeImagePath } from "../utils";
-
+import useWindowDimensions from "../useWindowDimensions";
 const Wrapper = styled.div`
   background: black;
   padding-bottom: 200px;
@@ -60,21 +60,10 @@ const Box = styled(motion.div)<{ bgPhoto: string }>`
   font-size: 66px;
 `;
 
-const rowVariants = {
-  hidden: {
-    x: window.outerWidth + 5,
-  },
-  visible: {
-    x: 0,
-  },
-  exit: {
-    x: -window.outerWidth - 5,
-  },
-};
-
 const offset = 6;
 
 function Home() {
+  const width = useWindowDimensions();
   const { data, isLoading } = useQuery<IGetMoviesResult>(
     ["movies", "nowPlaying"],
     getMovies
@@ -107,15 +96,14 @@ function Home() {
           <Slider>
             <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
               <Row
-                variants={rowVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
+                initial={{ x: width + 10 }}
+                animate={{ x: 0 }}
+                exit={{ x: -width - 10 }}
                 transition={{ type: "tween", duration: 1 }}
                 key={index}
               >
                 {data?.results
-                  .slice(1)
+                  .slice(1) //배경으로 쓴 거 제외
                   .slice(offset * index, offset * index + offset)
                   .map((movie) => (
                     <Box
