@@ -3,17 +3,21 @@ import Header from "./Components/Header";
 import Home from "./Routes/Home";
 import Search from "./Routes/Search";
 import Tv from "./Routes/Tv";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function App() {
+  const client = new QueryClient();
   return (
-    <Router>
-      <Header />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/tv" element={<Tv />} />
-        <Route path="/search" element={<Search />} />
-      </Routes>
-    </Router>
+    <QueryClientProvider client={client}>
+      <Router>
+        <Header />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/tv" element={<Tv />} />
+          <Route path="/search" element={<Search />} />
+        </Routes>
+      </Router>
+    </QueryClientProvider>
   );
 }
 
