@@ -3,10 +3,16 @@ const BASE_PATH = "https://api.themoviedb.org/3";
 
 interface IMovie {
   id: number;
+  genres: {
+    id: number;
+    name: string;
+  };
   backdrop_path: string;
   poster_path: string;
   title: string;
+  release_date: string;
   overview: string;
+  vote_average: number;
 }
 
 export interface IGetMoviesResult {

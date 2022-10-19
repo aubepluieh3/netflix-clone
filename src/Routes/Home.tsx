@@ -6,6 +6,8 @@ import { getMovies, IGetMoviesResult } from "../api";
 import { makeImagePath } from "../utils";
 import useWindowDimensions from "../useWindowDimensions";
 import { PathMatch, useNavigate, useMatch } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar } from "@fortawesome/free-solid-svg-icons";
 const Wrapper = styled.div`
   background: black;
   padding-bottom: 200px;
@@ -75,11 +77,14 @@ const Info = styled(motion.div)`
   position: absolute;
   width: 100%;
   bottom: 0;
-  h4 {
+  display: flex;
+  flex-direction: column;
+  span {
     text-align: center;
-    font-size: 18px;
+    font-size: 13px;
   }
 `;
+
 const Overlay = styled(motion.div)`
   position: fixed;
   top: 0;
@@ -110,17 +115,28 @@ const BigCover = styled.div`
 
 const BigTitle = styled.h3`
   color: ${(props) => props.theme.white.lighter};
-  padding: 20px;
+  padding: 10px 20px;
   font-size: 46px;
   position: relative;
   top: -80px;
 `;
 
-const BigOverview = styled.p`
+const BigOverview = styled.div`
   padding: 20px;
   position: relative;
   top: -80px;
   color: ${(props) => props.theme.white.lighter};
+  display: flex;
+  flex-direction: column;
+`;
+
+const Header = styled.div`
+  display: flex;
+  align-items: center;
+  svg {
+    margin-right: 3px;
+  }
+  margin-bottom: 5px;
 `;
 
 const boxVariants = {
@@ -158,6 +174,7 @@ function Home() {
     ["movies", "nowPlaying"],
     getMovies
   );
+  console.log(data, isLoading);
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const incraseIndex = () => {
@@ -214,7 +231,8 @@ function Home() {
                       bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
                     >
                       <Info variants={infoVariants}>
-                        <h4>{movie.title}</h4>
+                        <span>{movie.release_date.substring(0, 4)}</span>
+                        <span>{movie.title}</span>
                       </Info>
                     </Box>
                   ))}
@@ -244,7 +262,16 @@ function Home() {
                         }}
                       />
                       <BigTitle>{clickedMovie.title}</BigTitle>
-                      <BigOverview>{clickedMovie.overview}</BigOverview>
+
+                      <BigOverview>
+                        <Header>
+                          <FontAwesomeIcon icon={faStar} />
+                          <span>{clickedMovie.vote_average}</span>
+                        </Header>
+
+                        {clickedMovie.overview}
+                        <span>{clickedMovie.release_date}</span>
+                      </BigOverview>
                     </>
                   )}
                 </BigMovie>
