@@ -31,13 +31,13 @@ const Banner = styled.div<{ bgPhoto: string }>`
   background-size: cover;
 `;
 
-const Title = styled.h2`
-  font-size: 68px;
+const Title = styled.span`
+  font-size: 60px;
   margin-bottom: 20px; ;
 `;
 
-const Overview = styled.p`
-  font-size: 30px;
+const Overview = styled.span`
+  font-size: 26px;
   width: 50%;
 `;
 
@@ -194,6 +194,7 @@ function Home() {
   const clickedMovie =
     bigMovieMatch?.params.id &&
     data?.results.find((movie) => movie.id === Number(bigMovieMatch.params.id));
+
   return (
     <Wrapper>
       {isLoading ? (
@@ -268,7 +269,6 @@ function Home() {
                           <FontAwesomeIcon icon={faStar} />
                           <span>{clickedMovie.vote_average}</span>
                         </Header>
-
                         {clickedMovie.overview}
                         <span>{clickedMovie.release_date}</span>
                       </BigOverview>

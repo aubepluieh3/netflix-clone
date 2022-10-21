@@ -26,8 +26,42 @@ export interface IGetMoviesResult {
   total_results: number;
 }
 
+interface ITvShow {
+  backdrop_path: string;
+  first_air_date: string;
+  id: number;
+  name: string;
+  origin_country: string[];
+  original_language: string;
+  original_name: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  vote_average: number;
+  vote_count: number;
+  number_of_episodes: number;
+  number_of_seasons: number;
+}
+
+export interface IGetTvResult {
+  dates: {
+    maximum: string;
+    minimum: string;
+  };
+  page: number;
+  results: ITvShow[];
+  total_pages: number;
+  total_results: number;
+}
+
 export function getMovies() {
   return fetch(`${BASE_PATH}/movie/now_playing?api_key=${API_KEY}`).then(
+    (response) => response.json()
+  );
+}
+
+export function getTv() {
+  return fetch(`${BASE_PATH}/tv/on_the_air?api_key=${API_KEY}`).then(
     (response) => response.json()
   );
 }
