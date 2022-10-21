@@ -3,7 +3,7 @@ import { motion, AnimatePresence, useScroll } from "framer-motion";
 import { useState } from "react";
 import styled from "styled-components";
 import { getMovies, IGetMoviesResult } from "../api";
-import { makeImagePath } from "../utils";
+import { makeImagePath, Types } from "../utils";
 import useWindowDimensions from "../useWindowDimensions";
 import { PathMatch, useNavigate, useMatch } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -79,6 +79,7 @@ const Info = styled(motion.div)`
   bottom: 0;
   display: flex;
   flex-direction: column;
+
   span {
     text-align: center;
     font-size: 13px;
@@ -172,7 +173,7 @@ function Home() {
   const width = useWindowDimensions();
   const { data, isLoading } = useQuery<IGetMoviesResult>(
     ["movies", "nowPlaying"],
-    getMovies
+    () => getMovies(Types.now_playing)
   );
   console.log(data, isLoading);
   const [index, setIndex] = useState(0);

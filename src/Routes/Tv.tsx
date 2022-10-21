@@ -3,7 +3,7 @@ import { motion, AnimatePresence, useScroll } from "framer-motion";
 import { useState } from "react";
 import styled from "styled-components";
 import { getTv, IGetTvResult } from "../api";
-import { makeImagePath } from "../utils";
+import { makeImagePath, TypeShows } from "../utils";
 import useWindowDimensions from "../useWindowDimensions";
 import { PathMatch, useNavigate, useMatch } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -173,7 +173,7 @@ function Tv() {
   const width = useWindowDimensions();
   const { data, isLoading } = useQuery<IGetTvResult>(
     ["tvs", "on_the_air"],
-    getTv
+    () => getTv(TypeShows.on_the_air)
   );
   console.log(data, isLoading);
   const [index, setIndex] = useState(0);
@@ -191,7 +191,7 @@ function Tv() {
   const onBoxClicked = (tvId: number) => {
     navigate(`/tvs/${tvId}`);
   };
-  const onOverlayClick = () => navigate("/");
+  const onOverlayClick = () => navigate("/tv");
   const clickedTv =
     bigTvMatch?.params.id &&
     data?.results.find((tv) => tv.id === Number(bigTvMatch.params.id));
