@@ -17,3 +17,8 @@ export enum TypeShows {
   "airing_today" = "airing_today",
   "latest" = "latest",
 }
+
+export enum Category {
+  "movie" = "movie",
+  "Tv" = "Tv",
+}

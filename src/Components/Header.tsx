@@ -77,10 +77,10 @@ const Input = styled(motion.input)`
   position: absolute;
   right: 0px;
   padding: 5px 10px;
-  padding-left: 40px;
+  padding-left: 50px;
   z-index: -1;
   color: white;
-  font-size: 16px;
+  font-size: 14px;
   background-color: transparent;
   border: 1px solid ${(props) => props.theme.white.lighter};
 `;
@@ -106,7 +106,7 @@ const navVariants = {
   },
 };
 
-interface IForm {
+export interface IForm {
   keyword: string;
 }
 
