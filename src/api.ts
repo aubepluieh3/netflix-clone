@@ -75,6 +75,19 @@ export interface IGetTvResult {
   total_results: number;
 }
 
+interface ISearchResult {
+  id: number;
+  name?: string;
+  title?: string;
+}
+
+export interface IGetSearchKey {
+  page: number;
+  results: ISearchResult[];
+  total_pages: number;
+  total_results: number;
+}
+
 export function getMovies(type: Types) {
   return fetch(`${BASE_PATH}/movie/${type}?api_key=${API_KEY}`).then(
     (response) => response.json()
@@ -87,8 +100,24 @@ export function getTv(type: TypeShows) {
   );
 }
 
-export function getSearch(keyword: string, type: Category) {
+export async function getSearchKey(keyword: string) {
+  return await (
+    await fetch(
+      `${BASE_PATH}/search/multi?api_key=${API_KEY}&language=ko&query=${keyword}&page=1&include_adult=false&region=KR`
+    )
+  ).json();
+}
+
+export function getSearchMovie(keyword: string) {
   return fetch(
-    `${BASE_PATH}/search/${type}?api_key=${API_KEY}&query=${keyword}`
+    `${BASE_PATH}/search/movie?api_key=${API_KEY}&query=${keyword}`
   ).then((response) => response.json());
+}
+
+export async function getSearchTv(keyword: string) {
+  return await (
+    await fetch(
+      `${BASE_PATH}/search/tv?api_key=${API_KEY}&language=ko&&page=1&query=${keyword}&include_adult=false`
+    )
+  ).json();
 }

@@ -175,7 +175,7 @@ function Home() {
     ["movies", "nowPlaying"],
     () => getMovies(Types.now_playing)
   );
-  console.log(data, isLoading);
+  //console.log(data, isLoading);
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const incraseIndex = () => {

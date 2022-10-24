@@ -5,16 +5,23 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { useQuery } from "react-query";
-import { getSearch } from "../api";
+import {
+  getSearchKey,
+  getSearchMovie,
+  getSearchTv,
+  IGetMoviesResult,
+  IGetSearchKey,
+  IGetTvResult,
+} from "../api";
 import styled from "styled-components";
 import { motion, AnimatePresence, useScroll } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { IForm } from "../Components/Header";
 import { Category, makeImagePath } from "../utils";
-import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import useWindowDimensions from "../useWindowDimensions";
+import { useState } from "react";
 
 const SliderWrap = styled.div`
   position: relative;
@@ -31,6 +38,22 @@ const Row = styled(motion.div)`
   position: absolute;
   width: 100%;
   overflow: hidden;
+`;
+
+const Banner = styled.div<{ bgPhoto: string }>`
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
+    url(${(props) => props.bgPhoto});
+  background-size: cover;
+`;
+
+const Overview = styled.span`
+  font-size: 26px;
+  width: 50%;
 `;
 
 const Box = styled(motion.div)<{ bgPhoto: string }>`
@@ -113,21 +136,6 @@ const Overlay = styled(motion.div)`
   background-color: rgba(0, 0, 0, 0.5);
   opacity: 0;
   z-index: 3;
-`;
-
-const NotSearchWrap = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  height: 100vh;
-  width: 100%;
-
-  span {
-    font-size: 50px;
-    font-weight: 800;
-  }
 `;
 
 const SearchSubmit = styled.form`
@@ -214,11 +222,37 @@ const Search = () => {
   const width = useWindowDimensions();
   const keyword = new URLSearchParams(location.search).get("keyword");
   const bigMovieMatch: PathMatch<string> | null = useMatch("/search");
-  const { data, isLoading } = useQuery(["SearchData", keyword, "movie"], () =>
-    getSearch(keyword!, Category.movie)
-  );
+
+  // const { data: keyData, isLoading: keyLoading } = useQuery<IGetSearchKey>(
+  //   ["search", "key"],
+  //   () => getSearchKey(keyword!),
+  //   { enabled: !!keyword }
+  // );
+  const { data: movieData, isLoading: movieLoading } =
+    useQuery<IGetMoviesResult>(
+      ["search", "movie"],
+      () => getSearchMovie(keyword!),
+      { enabled: !!keyword }
+    );
+  // const { data: tvData, isLoading: tvLoading } = useQuery<IGetTvResult>(
+  //   ["search", "tv"],
+  //   () => getSearchTv(keyword!),
+  //   { enabled: !!keyword }
+  // );
+
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
+
+  const increaseIndex = () => {
+    if (movieData) {
+      if (leaving) return;
+      toggleLeaving();
+      const totalMovies = movieData.results.length - 1;
+      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
+    }
+  };
+
   const toggleLeaving = () => setLeaving((prev) => !prev);
   const onBoxClicked = (keyword: string, movieId: number) => {
     navigate(`/search?keyword=${keyword}/${movieId}`);
@@ -235,25 +269,24 @@ const Search = () => {
 
   const clickedMovie =
     bigMovieMatch?.params.id &&
-    data?.results.find((movie) => movie.id === Number(bigMovieMatch.params.id));
+    movieData?.results.find(
+      (movie) => movie.id === Number(bigMovieMatch.params.id)
+    );
 
   return (
     <>
       {keyword === null ? (
-        <NotSearchWrap>
-          <span>아무런 검색을 하지 않았습니다.</span>
-          <SearchSubmit onSubmit={handleSubmit(onValid)}>
-            <Input
-              {...register("keyword", { required: true, minLength: 2 })}
-              transition={{ type: "linear" }}
-              placeholder="Search for movie or tv show"
-              autoComplete="off"
-            />
-          </SearchSubmit>
-        </NotSearchWrap>
+        <SearchSubmit onSubmit={handleSubmit(onValid)}>
+          <Input
+            {...register("keyword", { required: true, minLength: 2 })}
+            transition={{ type: "linear" }}
+            placeholder="Search for movie or tv show"
+            autoComplete="off"
+          />
+        </SearchSubmit>
       ) : (
         <>
-          {isLoading ? (
+          {movieLoading ? (
             <div>Loading...</div>
           ) : (
             <SearchWrap>
@@ -261,7 +294,15 @@ const Search = () => {
                 <span>{keyword}</span>
                 (을)를 검색한 결과입니다.
               </SearchTitle>
-
+              <Banner
+                onClick={increaseIndex}
+                bgPhoto={makeImagePath(
+                  movieData?.results[0].backdrop_path || ""
+                )}
+              >
+                <Title>{movieData?.results[0].title}</Title>
+                <Overview>{movieData?.results[0].overview}</Overview>
+              </Banner>
               <SliderWrap>
                 <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
                   <Row
@@ -271,8 +312,7 @@ const Search = () => {
                     transition={{ type: "tween", duration: 1 }}
                     key={index}
                   >
-                    {data?.results
-
+                    {movieData?.results
                       .slice(offset * index, offset * index + offset)
                       .map((movie) => (
                         <Box
